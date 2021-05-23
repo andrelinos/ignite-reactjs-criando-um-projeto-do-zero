@@ -16,6 +16,7 @@ const Preview = async (
   res: NextApiResponse
 ): Promise<void> => {
   const { token: ref, documentId } = req.query;
+
   const redirectUrl = await getPrismicClient(req)
     .getPreviewResolver(ref as string, documentId as string)
     .resolve(linkResolver, '/');

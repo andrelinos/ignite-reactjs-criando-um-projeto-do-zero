@@ -2,14 +2,16 @@ import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiClock, FiEdit } from 'react-icons/fi';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { RichText } from 'prismic-dom';
 import Prismic from '@prismicio/client';
 
-import { verify } from 'crypto';
 import { getPrismicClient } from '../../services/prismic';
+
+import Comments from '../../components/Comments';
+import PreviewButton from '../../components/PreviewButton';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
@@ -55,7 +57,7 @@ export default function Post({
   const router = useRouter();
 
   if (router.isFallback) {
-    return <div>Loading...</div>;
+    return <div>Carregando...</div>;
   }
 
   const amountWordsTotalOfContent = RichText.asText(
@@ -74,7 +76,7 @@ export default function Post({
   ).length;
 
   const readingTime = Math.ceil(
-    (amountWordsOfContentHeading + amountWordsOfContentHeading) / 200
+    (amountWordsTotalOfContent + amountWordsOfContentHeading) / 200
   );
 
   return (
@@ -83,14 +85,87 @@ export default function Post({
         <title>{post.data.title} | Space Traveling</title>
       </Head>
 
-      <section className={styles.banner}>
-        <img src={post.data.banner.url} alt="Banner" />
-      </section>
+      {post.data.banner.url && (
+        <section className={styles.banner}>
+          <img src={post.data.banner.url} alt="Banner" />
+        </section>
+      )}
 
-      <main className={styles.content}>
+      <main className={commonStyles.content}>
         <article className={styles.post}>
           <h1>{post.data.title}</h1>
+
+          <div className={styles.postInfo}>
+            <span>
+              <FiCalendar size={20} color="#bbbbbb" />
+              {format(parseISO(post.first_publication_date), 'dd MMM yyyy', {
+                locale: ptBR,
+              })}
+            </span>
+
+            <span>
+              <FiUser size={20} color="#bbbbbb" />
+              {post.data.author}
+            </span>
+
+            <span>
+              <FiClock size={20} color="#bbbbbb" />
+              {readingTime} min
+            </span>
+
+            <span>
+              <FiEdit size={20} color="#aaaaaa" />
+              {format(
+                parseISO(post.first_publication_date),
+                "'Editado' dd MMM yyyy",
+                {
+                  locale: ptBR,
+                }
+              )}
+            </span>
+          </div>
+          <div className={styles.postContent}>
+            {post.data.content.map(({ heading, body }) => (
+              <div key={heading}>
+                {heading && <h2>{heading}</h2>}
+
+                <div
+                  className={styles.postSection}
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={{ __html: RichText.asHtml(body) }}
+                />
+              </div>
+            ))}
+          </div>
         </article>
+
+        <aside className={styles.footer}>
+          <div>
+            {previousPost && (
+              <>
+                <p>{previousPost.title}</p>
+                <Link href={`/post/${previousPost.uid}`}>
+                  <a>Post anterior</a>
+                </Link>
+              </>
+            )}
+          </div>
+
+          <div>
+            {nextPost && (
+              <>
+                <p>{nextPost.title}</p>
+                <Link href={`/post/${nextPost.uid}`}>
+                  <a>Próximo post</a>
+                </Link>
+              </>
+            )}
+          </div>
+        </aside>
+
+        <Comments />
+
+        {preview && <PreviewButton />}
       </main>
     </>
   );
@@ -138,39 +213,33 @@ export const getStaticProps: GetStaticProps<PostProps> = async ({
   const response = await prismic.getByUID('post', String(slug), {});
 
   const responsePreviousPost = await prismic.query(
-    Prismic.predicates.at('document.type', 'post'),
+    Prismic.Predicates.at('document.type', 'post'),
     {
       pageSize: 1,
       after: slug,
-      orderings: ['document.firt_publication_date desc'],
+      orderings: '[document.first_publication_date desc]',
     }
   );
 
   const responseNextPost = await prismic.query(
-    Prismic.predicates.at('document.type', 'post'),
-    {
-      pageSize: 1,
-      after: slug,
-      orderings: ['document.firt_publication_date'],
-    }
+    Prismic.Predicates.at('document.type', 'post'),
+    { pageSize: 1, after: slug, orderings: '[document.first_publication_date]' }
   );
 
   const previousPost = verifyNextPost(responsePreviousPost, slug);
 
   const nextPost = verifyNextPost(responseNextPost, slug);
 
-  const [title, subtitle, banner, author, content] = response.data;
-
   const post: Post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
     last_publication_date: response.last_publication_date,
     data: {
-      title,
-      subtitle,
-      banner,
-      author,
-      content,
+      title: response.data.title,
+      subtitle: response.data.subtitle,
+      banner: response.data.banner,
+      author: response.data.author,
+      content: response.data.content,
     },
   };
 

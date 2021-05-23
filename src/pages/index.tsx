@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import { getPrismicClient } from '../services/prismic';
+import PreviewButton from '../components/PreviewButton';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
@@ -74,30 +75,40 @@ export default function Home({
       <div className={styles.container}>
         <main className={commonStyles.content}>
           <section className={styles.posts}>
-            <Link href="/">
-              <a href="/">
-                <h2>Titulo do post</h2>
-                <p>Subtítulo do post</p>
-                <div>
-                  <span>
-                    <FiCalendar size={20} color="#bbb" />
-                    {format(new Date('2021-05-06'), 'dd MMM yyyy', {
-                      locale: ptBR,
-                    })}
-                  </span>
+            {posts.map(post => (
+              <Link href={`/post/${post.uid}`} key={post.uid}>
+                <a>
+                  <h2>{post.data.title}</h2>
+                  <p>{post.data.subtitle}</p>
+                  <div>
+                    <span>
+                      <FiCalendar size={20} color="#bbb" />
+                      {format(
+                        new Date(post.first_publication_date),
+                        'dd MMM yyyy',
+                        {
+                          locale: ptBR,
+                        }
+                      )}
+                    </span>
 
-                  <span>
-                    <FiUser size={20} color="#bbbb" />
-                    Andrelino Silva
-                  </span>
-                </div>
-              </a>
-            </Link>
+                    <span>
+                      <FiUser size={20} color="#bbbb" />
+                      {post.data.author}
+                    </span>
+                  </div>
+                </a>
+              </Link>
+            ))}
           </section>
 
-          <button type="button" onClick={handlePagination}>
-            Carregar mais posts
-          </button>
+          {nextPage && (
+            <button type="button" onClick={handlePagination}>
+              Carregar mais posts
+            </button>
+          )}
+
+          {preview && <PreviewButton />}
         </main>
       </div>
     </>
@@ -114,7 +125,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async ({
     [Prismic.predicates.at('document.type', 'post')],
     {
       fetch: ['post.title', 'post.subtitle', 'post.author'],
-      pageSize: 20,
+      pageSize: 2, // default 20
       ref: previewData?.ref ?? null,
     }
   );

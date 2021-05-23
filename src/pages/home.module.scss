@@ -53,6 +53,14 @@
       }
     }
 
+    transition: filter 0.2s;
+    cursor: default;
+
+    h2:hover {
+      filter: brightness(80%);
+      cursor: pointer;
+    }
+
     & + a {
       margin-top: 3rem;
     }
