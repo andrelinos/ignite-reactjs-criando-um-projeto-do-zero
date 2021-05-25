@@ -17,6 +17,9 @@ interface Post {
   uid?: string;
   first_publication_date: string | null;
   data: {
+    banner: {
+      url: string;
+    };
     title: string;
     subtitle: string;
     author: string;
@@ -54,6 +57,7 @@ export default function Home({
             uid: post.uid,
             first_publication_date: post.first_publication_date,
             data: {
+              banner: post.data.banner,
               title: post.data.title,
               subtitle: post.data.subtitle,
               author: post.data.author,
@@ -66,6 +70,7 @@ export default function Home({
       });
   }
 
+  console.log(posts);
   return (
     <>
       <Head>
@@ -78,24 +83,31 @@ export default function Home({
             {posts.map(post => (
               <Link href={`/post/${post.uid}`} key={post.uid}>
                 <a>
-                  <h2>{post.data.title}</h2>
-                  <p>{post.data.subtitle}</p>
+                  {post.data.banner.url && (
+                    <section className={styles.banner}>
+                      <img src={post.data.banner.url} alt="Banner" />
+                    </section>
+                  )}
                   <div>
-                    <span>
-                      <FiCalendar size={20} color="#bbb" />
-                      {format(
-                        new Date(post.first_publication_date),
-                        'dd MMM yyyy',
-                        {
-                          locale: ptBR,
-                        }
-                      )}
-                    </span>
+                    <h2>{post.data.title}</h2>
+                    <p>{post.data.subtitle}</p>
+                    <div>
+                      <span>
+                        <FiCalendar size={20} color="#bbb" />
+                        {format(
+                          new Date(post.first_publication_date),
+                          'dd MMM yyyy',
+                          {
+                            locale: ptBR,
+                          }
+                        )}
+                      </span>
 
-                    <span>
-                      <FiUser size={20} color="#bbbb" />
-                      {post.data.author}
-                    </span>
+                      <span>
+                        <FiUser size={20} color="#bbbb" />
+                        {post.data.author}
+                      </span>
+                    </div>
                   </div>
                 </a>
               </Link>
@@ -124,7 +136,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async ({
   const postsResponse = await prismic.query(
     [Prismic.predicates.at('document.type', 'post')],
     {
-      fetch: ['post.title', 'post.subtitle', 'post.author'],
+      fetch: ['post.banner', 'post.title', 'post.subtitle', 'post.author'],
       pageSize: 2, // default 20
       ref: previewData?.ref ?? null,
     }
@@ -135,12 +147,15 @@ export const getStaticProps: GetStaticProps<HomeProps> = async ({
       uid: post.uid,
       first_publication_date: post.first_publication_date,
       data: {
+        banner: post.data.banner.url,
         title: post.data.title,
         subtitle: post.data.subtitle,
         author: post.data.author,
       },
     };
   });
+
+  console.log(posts);
 
   return {
     props: {
