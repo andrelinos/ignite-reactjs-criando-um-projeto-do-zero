@@ -116,7 +116,7 @@ export default function Post({
             <span>
               <FiEdit size={20} color="#aaaaaa" />
               {format(
-                parseISO(post.first_publication_date),
+                parseISO(post.last_publication_date),
                 "'Editado' dd MMM yyyy",
                 {
                   locale: ptBR,
