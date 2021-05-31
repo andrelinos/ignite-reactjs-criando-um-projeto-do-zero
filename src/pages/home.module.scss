@@ -16,27 +16,27 @@
   margin-top: 1.5rem;
 
   a {
-    display: block;
     width: 100%;
+    display: flex;
 
-    h2 {
+   .detailContainer h2 {
       font-size: 1.75rem;
       font-weight: bold;
       color: var(--gray-100);
       margin-bottom: 0.5rem;
     }
 
-    p {
+    .detailContainer p {
       font-size: 1.125rem;
       color: var(--gray-200);
       margin-bottom: 1.5rem;
     }
 
-    > div {
+    .detailContainer > div {
       display: flex;
     }
 
-    span {
+    .detailContainer span {
       font-size: 0.875rem;
       text-transform: capitalize;
       color: var(--gray-300);
@@ -56,13 +56,25 @@
     transition: filter 0.2s;
     cursor: default;
 
-    h2:hover {
+    .detailContainer h2:hover {
       filter: brightness(80%);
       cursor: pointer;
     }
 
     & + a {
       margin-top: 3rem;
+    }
+
+    .listThumbnail {
+      background: rgba(var(--gray-v-100), 0.5);
+      margin-right: 1rem;
+      border-radius: 0.125rem;
+      cursor: pointer;
+    }
+
+    .listThumbnail img {
+      width: 6rem;
+      height: 6rem;
     }
   }
 }

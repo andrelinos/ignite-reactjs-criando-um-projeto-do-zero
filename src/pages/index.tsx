@@ -85,10 +85,12 @@ export default function Home({
                 <a>
                   {post.data.banner.url && (
                     <section className={styles.banner}>
-                      <img src={post.data.banner.url} alt="Banner" />
+                      <div className={styles.listThumbnail}>
+                        <img src={post.data.banner.url} alt="Banner" />
+                      </div>
                     </section>
                   )}
-                  <div>
+                  <div className={styles.detailContainer}>
                     <h2>{post.data.title}</h2>
                     <p>{post.data.subtitle}</p>
                     <div>
@@ -145,17 +147,15 @@ export const getStaticProps: GetStaticProps<HomeProps> = async ({
   const posts = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: post.first_publication_date,
       data: {
         banner: post.data.banner.url,
         title: post.data.title,
         subtitle: post.data.subtitle,
         author: post.data.author,
       },
+      first_publication_date: post.first_publication_date,
     };
   });
-
-  console.log(posts);
 
   return {
     props: {
