@@ -1,7 +1,7 @@
 # Spacetraveling
 
 <p align="center">
-<img src="./PrtScn/logo.svg" alt="spacetraveling" width="200px"/>
+<img src="./PrtScn/logo.svg" alt="spacetraveling" width="400px"/>
 </p>
 
 Note:
