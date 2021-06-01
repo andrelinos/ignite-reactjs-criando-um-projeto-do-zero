@@ -17,9 +17,7 @@ interface Post {
   uid?: string;
   first_publication_date: string | null;
   data: {
-    banner: {
-      url: string;
-    };
+    banner: string;
     title: string;
     subtitle: string;
     author: string;
@@ -57,7 +55,7 @@ export default function Home({
             uid: post.uid,
             first_publication_date: post.first_publication_date,
             data: {
-              banner: post.data.banner,
+              banner: post.data.banner.url,
               title: post.data.title,
               subtitle: post.data.subtitle,
               author: post.data.author,
@@ -82,10 +80,10 @@ export default function Home({
             {posts.map(post => (
               <Link href={`/post/${post.uid}`} key={post.uid}>
                 <a>
-                  {post.data.banner.url && (
+                  {post.data.banner && (
                     <section className={styles.banner}>
                       <div className={styles.listThumbnail}>
-                        <img src={post.data.banner.url} alt="Banner" />
+                        <img src={post.data.banner} alt="Banner" />
                       </div>
                     </section>
                   )}
