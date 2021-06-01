@@ -1,9 +1,10 @@
 # Spacetraveling
-
+<br />
+<br />
 <p align="center">
 <img src="./PrtScn/logo.svg" alt="spacetraveling" width="400px"/>
 </p>
-
+<br />
 Note:
 <p>SpaceTraveling is a blog made with Next.js and integrated with Prismic  CMS⚛️  developed in the Ignite Bootcamp by RocketSeat.</p>
 <br />
